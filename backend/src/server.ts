@@ -32,6 +32,8 @@ if (!fs.existsSync(videosDir)) {
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// Render uses PORT environment variable, fallback to 3001 for local dev
+
 // Middleware
 app.use(cors());
 app.use(express.json());

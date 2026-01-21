@@ -41,5 +41,9 @@ Thumbs.db
 # TypeScript
 *.tsbuildinfo
 
+# Render
+.render/
+render/
+
 # Vercel
 .vercel
