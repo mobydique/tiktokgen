@@ -1,7 +1,13 @@
 import Replicate from 'replicate';
 import * as https from 'https';
 import * as http from 'http';
+import * as path from 'path';
+import dotenv from 'dotenv';
 import { GenerationParameters, defaultGenerationParameters } from '../models/GenerationParameters';
+
+// Load environment variables from project root
+const envPath = path.resolve(__dirname, '../../../.env');
+dotenv.config({ path: envPath });
 
 const REPLICATE_API_TOKEN = process.env.REPLICATE_API_TOKEN;
 const REPLICATE_MODEL = process.env.REPLICATE_MODEL || 'kwaivgi/kling-v2.5-turbo-pro';

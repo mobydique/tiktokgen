@@ -8,8 +8,9 @@ import textTemplatesRouter from './routes/text-templates';
 import videoGenerationRouter from './routes/video-generation';
 import { getDatabase } from './services/database';
 
-// Load environment variables
-dotenv.config();
+// Load environment variables from project root
+const envPath = path.resolve(__dirname, '../../.env');
+dotenv.config({ path: envPath });
 
 // Run migrations on startup
 try {

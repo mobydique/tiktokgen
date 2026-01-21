@@ -3,6 +3,21 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { characterProfilesApi } from '@/lib/api';
+import { DashboardLayout } from '../../dashboard-layout';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Skeleton } from '@/components/ui/skeleton';
+import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 
 export default function CharacterProfileEditPage() {
   const params = useParams();
@@ -72,95 +87,147 @@ export default function CharacterProfileEditPage() {
   };
 
   if (loading) {
-    return <div className="p-8">Loading...</div>;
+    return (
+      <DashboardLayout>
+        <div className="space-y-6">
+          <Skeleton className="h-10 w-64" />
+          <Card>
+            <CardHeader>
+              <Skeleton className="h-6 w-32" />
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-32 w-full" />
+            </CardContent>
+          </Card>
+        </div>
+      </DashboardLayout>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-2xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6">
-          {isNew ? 'Create Character Profile' : 'Edit Character Profile'}
-        </h1>
-
-        <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow space-y-4">
+    <DashboardLayout>
+      <div className="space-y-6">
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" onClick={() => router.back()}>
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
           <div>
-            <label className="block text-sm font-medium mb-1">Name</label>
-            <input
-              type="text"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full border rounded px-3 py-2"
-              required
-            />
+            <h2 className="text-3xl font-bold tracking-tight">
+              {isNew ? 'Create Character Profile' : 'Edit Character Profile'}
+            </h2>
+            <p className="text-muted-foreground">
+              {isNew
+                ? 'Create a new AI character profile for video generation'
+                : 'Update your character profile settings'}
+            </p>
           </div>
+        </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1">Character Prompt</label>
-            <textarea
-              value={formData.character_prompt}
-              onChange={(e) => setFormData({ ...formData, character_prompt: e.target.value })}
-              className="w-full border rounded px-3 py-2 h-32"
-              placeholder="Describe the character appearance, features, etc."
-              required
-            />
-          </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>Profile Details</CardTitle>
+            <CardDescription>
+              Configure the character appearance and generation parameters
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="name">Name</Label>
+                <Input
+                  id="name"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  placeholder="e.g., Elegant Woman"
+                  required
+                />
+              </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1">Style</label>
-            <select
-              value={formData.style}
-              onChange={(e) => setFormData({ ...formData, style: e.target.value as any })}
-              className="w-full border rounded px-3 py-2"
-            >
-              <option value="dancing">Dancing</option>
-              <option value="sexy">Sexy</option>
-              <option value="casual">Casual</option>
-              <option value="elegant">Elegant</option>
-              <option value="cute">Cute</option>
-              <option value="sporty">Sporty</option>
-            </select>
-          </div>
+              <div className="space-y-2">
+                <Label htmlFor="character_prompt">Character Prompt</Label>
+                <Textarea
+                  id="character_prompt"
+                  value={formData.character_prompt}
+                  onChange={(e) => setFormData({ ...formData, character_prompt: e.target.value })}
+                  placeholder="Describe the character appearance, features, etc. (max 500 characters)"
+                  className="min-h-[120px]"
+                  required
+                  maxLength={500}
+                />
+                <p className="text-xs text-muted-foreground">
+                  {formData.character_prompt.length}/500 characters
+                </p>
+              </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1">Seed (optional)</label>
-            <input
-              type="number"
-              value={formData.seed}
-              onChange={(e) => setFormData({ ...formData, seed: e.target.value })}
-              className="w-full border rounded px-3 py-2"
-              placeholder="Leave empty for random"
-            />
-          </div>
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="style">Style</Label>
+                  <Select
+                    value={formData.style}
+                    onValueChange={(value) => setFormData({ ...formData, style: value as any })}
+                  >
+                    <SelectTrigger id="style">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="dancing">Dancing</SelectItem>
+                      <SelectItem value="sexy">Sexy</SelectItem>
+                      <SelectItem value="casual">Casual</SelectItem>
+                      <SelectItem value="elegant">Elegant</SelectItem>
+                      <SelectItem value="cute">Cute</SelectItem>
+                      <SelectItem value="sporty">Sporty</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1">Telegram Username (optional)</label>
-            <input
-              type="text"
-              value={formData.telegram_username}
-              onChange={(e) => setFormData({ ...formData, telegram_username: e.target.value })}
-              className="w-full border rounded px-3 py-2"
-              placeholder="@username"
-            />
-          </div>
+                <div className="space-y-2">
+                  <Label htmlFor="seed">Seed (optional)</Label>
+                  <Input
+                    id="seed"
+                    type="number"
+                    value={formData.seed}
+                    onChange={(e) => setFormData({ ...formData, seed: e.target.value })}
+                    placeholder="Leave empty for random"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Use the same seed for consistent character appearance
+                  </p>
+                </div>
+              </div>
 
-          <div className="flex gap-4">
-            <button
-              type="submit"
-              disabled={saving}
-              className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
-            >
-              {saving ? 'Saving...' : 'Save'}
-            </button>
-            <button
-              type="button"
-              onClick={() => router.back()}
-              className="bg-gray-200 text-gray-800 px-6 py-2 rounded hover:bg-gray-300"
-            >
-              Cancel
-            </button>
-          </div>
-        </form>
+              <div className="space-y-2">
+                <Label htmlFor="telegram_username">Telegram Username (optional)</Label>
+                <Input
+                  id="telegram_username"
+                  value={formData.telegram_username}
+                  onChange={(e) => setFormData({ ...formData, telegram_username: e.target.value })}
+                  placeholder="@username"
+                />
+              </div>
+
+              <div className="flex gap-4">
+                <Button type="submit" disabled={saving}>
+                  {saving ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="mr-2 h-4 w-4" />
+                      Save Profile
+                    </>
+                  )}
+                </Button>
+                <Button type="button" variant="outline" onClick={() => router.back()}>
+                  Cancel
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }
